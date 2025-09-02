@@ -1,0 +1,401 @@
+/* Fileira de ícones nos cards de cômodos */
+.room-icons-row {
+    position: absolute;
+    left: 30px;
+    top: 240px;
+    z-index: 2;
+    width: auto;
+    height: auto;
+}
+
+/* Barra superior customizada */
+.top-bar-custom {
+    position: fixed;
+    top: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 370px;
+    height: 3px;
+    background: #fff;
+    border-radius: 2px;
+    z-index: 100;
+    pointer-events: none;
+}
+
+/* Frame de rolagem dos cards na Home */
+.rooms-frame {
+    width: 100%;
+    height: calc(100vh - 195px); /* Viewport height - top offset - navbar height */
+    position: absolute;
+    left: 0;
+    top: 115px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: transparent;
+    box-sizing: border-box;
+}
+
+/* Lista de cômodos na Home */
+.rooms-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    margin-top: 0;
+}
+
+.room-card {
+    width: 100%;
+    height: 300px;
+    background: #222;
+    position: relative;
+    overflow: hidden;
+}
+
+.room-card img {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    opacity: 0.85;
+    transition: opacity 0.2s;
+}
+
+.room-card span {
+    position: absolute;
+    left: 30px;
+    top: 30px;
+    z-index: 1;
+    color: #fff;
+    font-size: 35px;
+    font-family: 'Raleway', Arial, sans-serif;
+    font-weight: 300;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+.room-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+}
+
+.page-title {
+    text-align: center;
+    color: #fff;
+    font-size: 2.2rem;
+    font-family: 'Raleway', Arial, sans-serif;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+/* Estilos base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    font-family: 'Raleway', Arial, sans-serif;
+    background-color: #101010;
+    color: #fff;
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.container {
+    width: 100%;
+    max-width: 412px;
+    margin: 0 auto;
+    padding: 20px;
+    padding-bottom: 90px; /* Space for navbar */
+}
+
+/* Estilos das páginas */
+.page {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    background: #101010;
+    min-height: calc(100vh - 16px);
+    box-sizing: border-box;
+}
+
+.page.active {
+    display: block;
+    opacity: 1;
+}
+
+/* Estilos da Navbar */
+.navbar {
+    width: 100%;
+    max-width: 412px;
+    height: 77px;
+    background: #1C1C1C;
+    border-radius: 5px 5px 0 0;
+    border: none;
+    display: flex;
+    justify-content: center;
+    padding: 0;
+    gap: 45px;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    --indicator-left: 50%;
+    z-index: 1000;
+    box-sizing: border-box;
+}
+
+/* Bolinha branca indicadora */
+.navbar::before {
+    content: '';
+    position: absolute;
+    width: 112px;
+    height: 52px;
+    background: url('https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/pageselector.svg') no-repeat center center / contain;
+    z-index: 2;
+    top: -17px;
+    left: calc(var(--indicator-left, 50%) - 56px);
+    transition: left 0.45s cubic-bezier(.4,1,.5,1);
+    pointer-events: none;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+}
+
+.nav-icon-wrapper {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.nav-item.active {
+    position: relative;
+}
+
+.nav-item.active .nav-icon {
+    position: relative;
+    z-index: 2;
+    transform: translateY(-33px) scale(1.15);
+    transition: transform 0.3s cubic-bezier(.4,1.5,.5,1);
+}
+
+.nav-icon-wrapper {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.nav-icon {
+    width: 25px;
+    height: 25px;
+    transition: all 0.3s cubic-bezier(.4,1.5,.5,1);
+}
+
+.nav-item:not(.active) .nav-icon {
+    filter: brightness(0) saturate(100%) invert(32%) sepia(0%) saturate(0%) hue-rotate(147deg) brightness(96%) contrast(89%);
+}
+
+.nav-item.active .nav-icon {
+    filter: brightness(0) saturate(100%);
+}
+
+.nav-item:not(.active):hover .nav-icon {
+    transform: scale(1.1);
+}
+
+.nav-item:hover .nav-text {
+    color: #8A38F5;
+}
+
+/* Escritorio Page */
+.page-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+}
+
+.page-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse 91.69% 175.81% at 50.00% -0.00%, rgba(0, 0, 0, 0) 0%, #101010 100%);
+    -webkit-backdrop-filter: blur(2.5px);
+    backdrop-filter: blur(2.5px);
+}
+
+.page-header {
+    position: absolute;
+    top: 40px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.page-header .page-title {
+    color: white;
+    font-size: 25px;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 500;
+    text-shadow: 0px 4px 8px rgba(0, 0, 0, 0.50);
+    margin: 0;
+}
+
+.back-btn {
+    position: absolute;
+    left: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.back-btn img {
+    width: 32px;
+    height: 32px;
+}
+
+.controls-grid {
+    position: absolute;
+    top: 115px;
+    left: 21px;
+    right: 21px;
+    bottom: 90px; /* navbar height */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 131px;
+    gap: 10px;
+    z-index: 1;
+    align-items: center;
+}
+
+.control-card {
+    background: rgba(255, 255, 255, 0.1);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    color: white;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 200;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.3s ease;
+    height: 100%;
+}
+
+.control-card:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.control-card.large {
+    grid-column: span 2;
+}
+
+.control-icon {
+    width: 60px;
+    height: 60px;
+}
+
+.control-label {
+    font-size: 20px;
+}
+
+.control-state {
+    font-size: 20px;
+}
+
+.control-card.dvr {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Thermostat Styles */
+.thermostat {
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    margin: auto;
+    cursor: default !important;
+}
+
+.thermostat-track {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: conic-gradient(from -135deg at 50% 50%, #00D1FF 0%, #FF8A00 75%, #333 75%, #333 100%);
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+}
+
+.thermostat-value {
+    position: relative;
+    z-index: 1;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 40px;
+    font-weight: 300;
+    color: white;
+    background: #1D1D1D;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.thermostat-handle {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    background: white;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 2;
+    border: 4px solid #1D1D1D;
+    box-shadow: 0 0 10px rgba(255,255,255,0.5);
+    transform-origin: center center;
+}

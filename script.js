@@ -1,0 +1,217 @@
+// Funções de toggle para ícones nos cards da home
+function toggleTelamovelIcon(el) {
+    const img = el.querySelector('img');
+    if (el.dataset.state === 'off') {
+        img.src = 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-telamovel-on.svg';
+        el.dataset.state = 'on';
+    } else {
+        img.src = 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-telamovel-off.svg';
+        el.dataset.state = 'off';
+    }
+}
+
+function toggleSmartglassIcon(el) {
+    const img = el.querySelector('img');
+    if (el.dataset.state === 'off') {
+        img.src = 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-smartglass-on.svg';
+        el.dataset.state = 'on';
+    } else {
+        img.src = 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-smartglass-off.svg';
+        el.dataset.state = 'off';
+    }
+}
+
+function toggleShaderIcon(el) {
+    const img = el.querySelector('img');
+    if (el.dataset.state === 'off') {
+        img.src = 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-shader-on.svg';
+        el.dataset.state = 'on';
+    } else {
+        img.src = 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-shader-off.svg';
+        el.dataset.state = 'off';
+    }
+}
+
+function toggleLightIcon(el) {
+    const img = el.querySelector('img');
+    const deviceIdsAttr = el.dataset.deviceIds;
+    const deviceIds = deviceIdsAttr ? deviceIdsAttr.split(',') : [];
+
+    if (el.dataset.state === 'off') {
+        img.src = 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-light-on.svg';
+        el.dataset.state = 'on';
+        deviceIds.forEach(id => sendHubitatCommand(id, 'on'));
+    } else {
+        img.src = 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-light-off.svg';
+        el.dataset.state = 'off';
+        deviceIds.forEach(id => sendHubitatCommand(id, 'off'));
+    }
+}
+
+function toggleTvIcon(el) {
+    const img = el.querySelector('img');
+    if (el.dataset.state === 'off') {
+        img.src = 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-tv-on.svg';
+        el.dataset.state = 'on';
+    } else {
+        img.src = 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-tv-off.svg';
+        el.dataset.state = 'off';
+    }
+}
+
+// --- Funções para a página do Escritório ---
+
+function toggleDevice(el, deviceType) {
+    const img = el.querySelector('.control-icon');
+    const stateEl = el.querySelector('.control-state');
+    const currentState = el.dataset.state;
+    let newState;
+    let newLabel;
+
+    const icons = {
+        light: { 
+            on: 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-light-on.svg', 
+            off: 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-light-off.svg' 
+        },
+        tv: { 
+            on: 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-tv-on.svg', 
+            off: 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-tv-off.svg' 
+        },
+        shader: { 
+            on: 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-shader-on.svg', 
+            off: 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-shader-off.svg'
+        }
+    };
+
+    if (!icons[deviceType]) return;
+
+    let deviceId;
+    // IDs fornecidos: Trilho = 101, Pendente = 102
+    const controlLabel = el.querySelector('.control-label').textContent;
+    if (controlLabel === 'Pendente') {
+        deviceId = '102';
+    } else if (controlLabel === 'Trilho') {
+        deviceId = '101';
+    } else {
+        deviceId = null;
+    }
+
+    if (currentState === 'off' || currentState === 'closed') {
+        newState = 'on';
+        newLabel = deviceType === 'shader' ? 'Abertas' : 'ON';
+        img.src = icons[deviceType].on;
+        if (deviceId) sendHubitatCommand(deviceId, 'on');
+    } else {
+        newState = deviceType === 'shader' ? 'closed' : 'off';
+        newLabel = deviceType === 'shader' ? 'Fechadas' : 'OFF';
+        img.src = icons[deviceType].off;
+        if (deviceId) sendHubitatCommand(deviceId, 'off');
+    }
+
+    el.dataset.state = newState;
+    if (stateEl) stateEl.textContent = newLabel;
+}
+
+function setupThermostat() {
+    const thermostat = document.getElementById('thermostat-new');
+    if (!thermostat) return;
+
+    const handle = thermostat.querySelector('.thermostat-new-handle');
+    const tempDisplay = thermostat.querySelector('#temp-display');
+    const tickContainer = thermostat.querySelector('.thermostat-new-tick-container');
+    const ticks = Array.from(tickContainer.children);
+
+    const minTemp = 16;
+    const maxTemp = 30;
+    const startAngle = -135; // Angle for 16 degrees
+    const endAngle = 135;   // Angle for 30 degrees
+    const angleRange = endAngle - startAngle; // 270 degrees
+
+    let isDragging = false;
+
+    function updateThermostat(currentAngle) {
+        let clampedAngle = Math.max(startAngle, Math.min(endAngle, currentAngle));
+
+        const temp = Math.round(((clampedAngle - startAngle) / angleRange) * (maxTemp - minTemp) + minTemp);
+        tempDisplay.textContent = temp;
+
+        handle.style.transform = `translateX(-50%) rotate(${clampedAngle}deg)`;
+
+        ticks.forEach((tick, index) => {
+            const tickTemp = minTemp + index;
+            if (tickTemp <= temp) {
+                tick.classList.add('active');
+            } else {
+                tick.classList.remove('active');
+            }
+        });
+    }
+
+    function handleInteraction(e) {
+        const thermostatRect = thermostat.getBoundingClientRect();
+        const centerX = thermostatRect.left + thermostatRect.width / 2;
+        const centerY = thermostatRect.top + thermostatRect.height / 2;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        let angle = Math.atan2(clientY - centerY, clientX - centerX) * 180 / Math.PI;
+
+        if (angle > endAngle && angle < startAngle + 360) {
+            if (Math.abs(angle - endAngle) < Math.abs(angle - startAngle)) {
+                angle = endAngle;
+            } else {
+                angle = startAngle;
+            }
+        } else if (angle < startAngle) {
+            angle = startAngle;
+        } else if (angle > endAngle) {
+            angle = endAngle;
+        }
+
+        updateThermostat(angle);
+    }
+
+    thermostat.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        isDragging = true;
+        handleInteraction(e);
+    });
+    thermostat.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        isDragging = true;
+        handleInteraction(e);
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if (isDragging) handleInteraction(e);
+    });
+    window.addEventListener('touchmove', (e) => {
+        if (isDragging) handleInteraction(e);
+    });
+
+    window.addEventListener('mouseup', () => { isDragging = false; });
+    window.addEventListener('touchend', () => { isDragging = false; });
+
+    const initialTemp = 18;
+    const initialAngle = ((initialTemp - minTemp) / (maxTemp - minTemp)) * angleRange + startAngle;
+    updateThermostat(initialAngle);
+}
+
+
+// --- Controle do Hubitat ---
+
+const HUBITAT_CLOUD_BASE_URL = 'https://cloud.hubitat.com/api/e45cb756-9028-44c2-8a00-e6fb3651856c/apps/77/devices/';
+const HUBITAT_ACCESS_TOKEN = '759c4ea4-f9c5-4250-bd11-131221eaad76';
+
+function sendHubitatCommand(deviceId, command, value) {
+    let url = `${HUBITAT_CLOUD_BASE_URL}${deviceId}/${command}`;
+    if (value) url += `/${value}`;
+    url += `?access_token=${HUBITAT_ACCESS_TOKEN}`;
+
+    console.log(`Enviando comando para o Hubitat: ${url}`);
+
+    fetch(url)
+        .then(response => response.ok ? response.json() : Promise.reject(response))
+        .then(data => console.log('Resposta do Hubitat:', data))
+        .catch(error => console.error('Erro ao enviar comando para o Hubitat:', error));
+}
