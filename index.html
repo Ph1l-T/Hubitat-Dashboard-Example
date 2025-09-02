@@ -212,11 +212,13 @@
             <div class="control-state">OFF</div>
         </div>
         <div class="control-card large thermostat" id="thermostat">
-            <div class="thermostat-track"></div>
-            <div class="thermostat-value">
-                <span id="temp-display">18</span>&deg;C
+            <div class="thermostat-display">
+                <span id="current-temp">22</span>&deg;C
             </div>
-            <div class="thermostat-handle"></div>
+            <div class="thermostat-buttons">
+                <div class="temp-decrease" id="temp-decrease"></div>
+                <div class="temp-increase" id="temp-increase"></div>
+            </div>
         </div>
         <div class="control-card large" data-state="off" onclick="toggleDevice(this, 'tv')">
             <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-tv-off.svg" class="control-icon">

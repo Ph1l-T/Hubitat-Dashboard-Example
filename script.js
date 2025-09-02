@@ -113,88 +113,27 @@ function toggleDevice(el, deviceType) {
 }
 
 function setupThermostat() {
-    const thermostat = document.getElementById('thermostat-new');
-    if (!thermostat) return;
+    const currentTempSpan = document.getElementById('current-temp');
+    const tempDecreaseBtn = document.getElementById('temp-decrease');
+    const tempIncreaseBtn = document.getElementById('temp-increase');
 
-    const handle = thermostat.querySelector('.thermostat-new-handle');
-    const tempDisplay = thermostat.querySelector('#temp-display');
-    const tickContainer = thermostat.querySelector('.thermostat-new-tick-container');
-    const ticks = Array.from(tickContainer.children);
+    let currentTemperature = parseInt(currentTempSpan.textContent);
 
-    const minTemp = 16;
-    const maxTemp = 30;
-    const startAngle = -135; // Angle for 16 degrees
-    const endAngle = 135;   // Angle for 30 degrees
-    const angleRange = endAngle - startAngle; // 270 degrees
-
-    let isDragging = false;
-
-    function updateThermostat(currentAngle) {
-        let clampedAngle = Math.max(startAngle, Math.min(endAngle, currentAngle));
-
-        const temp = Math.round(((clampedAngle - startAngle) / angleRange) * (maxTemp - minTemp) + minTemp);
-        tempDisplay.textContent = temp;
-
-        handle.style.transform = `translateX(-50%) rotate(${clampedAngle}deg)`;
-
-        ticks.forEach((tick, index) => {
-            const tickTemp = minTemp + index;
-            if (tickTemp <= temp) {
-                tick.classList.add('active');
-            } else {
-                tick.classList.remove('active');
-            }
-        });
+    function updateTemperatureDisplay() {
+        currentTempSpan.textContent = currentTemperature;
     }
 
-    function handleInteraction(e) {
-        const thermostatRect = thermostat.getBoundingClientRect();
-        const centerX = thermostatRect.left + thermostatRect.width / 2;
-        const centerY = thermostatRect.top + thermostatRect.height / 2;
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-        let angle = Math.atan2(clientY - centerY, clientX - centerX) * 180 / Math.PI;
-
-        if (angle > endAngle && angle < startAngle + 360) {
-            if (Math.abs(angle - endAngle) < Math.abs(angle - startAngle)) {
-                angle = endAngle;
-            } else {
-                angle = startAngle;
-            }
-        } else if (angle < startAngle) {
-            angle = startAngle;
-        } else if (angle > endAngle) {
-            angle = endAngle;
-        }
-
-        updateThermostat(angle);
-    }
-
-    thermostat.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        isDragging = true;
-        handleInteraction(e);
-    });
-    thermostat.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        isDragging = true;
-        handleInteraction(e);
+    tempDecreaseBtn.addEventListener('click', () => {
+        currentTemperature--;
+        updateTemperatureDisplay();
     });
 
-    window.addEventListener('mousemove', (e) => {
-        if (isDragging) handleInteraction(e);
-    });
-    window.addEventListener('touchmove', (e) => {
-        if (isDragging) handleInteraction(e);
+    tempIncreaseBtn.addEventListener('click', () => {
+        currentTemperature++;
+        updateTemperatureDisplay();
     });
 
-    window.addEventListener('mouseup', () => { isDragging = false; });
-    window.addEventListener('touchend', () => { isDragging = false; });
-
-    const initialTemp = 18;
-    const initialAngle = ((initialTemp - minTemp) / (maxTemp - minTemp)) * angleRange + startAngle;
-    updateThermostat(initialAngle);
+    updateTemperatureDisplay(); // Initialize display
 }
 
 
