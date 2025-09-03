@@ -466,3 +466,32 @@ h1, h2, h3 {
 
 
 
+/* Local Raleway font faces */
+@font-face {
+    font-family: 'Raleway';
+    font-style: normal;
+    font-weight: 200;
+    font-display: swap;
+    src: url('fonts/raleway/Raleway-200.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Raleway';
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+    src: url('fonts/raleway/Raleway-300.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Raleway';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('fonts/raleway/Raleway-400.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Raleway';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('fonts/raleway/Raleway-500.woff2') format('woff2');
+}
