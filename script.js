@@ -1,11 +1,11 @@
-// Funções de toggle para ícones nos cards da home
+﻿// FunÃ§Ãµes de toggle para Ã­cones nos cards da home
 function toggleTelamovelIcon(el) {
     const img = el.querySelector('img');
     if (el.dataset.state === 'off') {
-        img.src = 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-telamovel-on.svg';
+        img.src = 'images/icons/icon-small-telamovel-on.svg';
         el.dataset.state = 'on';
     } else {
-        img.src = 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-telamovel-off.svg';
+        img.src = 'images/icons/icon-small-telamovel-off.svg';
         el.dataset.state = 'off';
     }
 }
@@ -13,10 +13,10 @@ function toggleTelamovelIcon(el) {
 function toggleSmartglassIcon(el) {
     const img = el.querySelector('img');
     if (el.dataset.state === 'off') {
-        img.src = 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-smartglass-on.svg';
+        img.src = 'images/icons/icon-small-smartglass-on.svg';
         el.dataset.state = 'on';
     } else {
-        img.src = 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-smartglass-off.svg';
+        img.src = 'images/icons/icon-small-smartglass-off.svg';
         el.dataset.state = 'off';
     }
 }
@@ -24,10 +24,10 @@ function toggleSmartglassIcon(el) {
 function toggleShaderIcon(el) {
     const img = el.querySelector('img');
     if (el.dataset.state === 'off') {
-        img.src = 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-shader-on.svg';
+        img.src = 'images/icons/icon-small-shader-on.svg';
         el.dataset.state = 'on';
     } else {
-        img.src = 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-shader-off.svg';
+        img.src = 'images/icons/icon-small-shader-off.svg';
         el.dataset.state = 'off';
     }
 }
@@ -38,11 +38,11 @@ function toggleLightIcon(el) {
     const deviceIds = deviceIdsAttr ? deviceIdsAttr.split(',') : [];
 
     if (el.dataset.state === 'off') {
-        img.src = 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-light-on.svg';
+        img.src = 'images/icons/icon-small-light-on.svg';
         el.dataset.state = 'on';
         deviceIds.forEach(id => sendHubitatCommand(id, 'on'));
     } else {
-        img.src = 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-light-off.svg';
+        img.src = 'images/icons/icon-small-light-off.svg';
         el.dataset.state = 'off';
         deviceIds.forEach(id => sendHubitatCommand(id, 'off'));
     }
@@ -51,15 +51,15 @@ function toggleLightIcon(el) {
 function toggleTvIcon(el) {
     const img = el.querySelector('img');
     if (el.dataset.state === 'off') {
-        img.src = 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-tv-on.svg';
+        img.src = 'images/icons/icon-small-tv-on.svg';
         el.dataset.state = 'on';
     } else {
-        img.src = 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-tv-off.svg';
+        img.src = 'images/icons/icon-small-tv-off.svg';
         el.dataset.state = 'off';
     }
 }
 
-// --- Funções para a página do Escritório ---
+// --- FunÃ§Ãµes para a pÃ¡gina do EscritÃ³rio ---
 
 function toggleDevice(el, deviceType) {
     const img = el.querySelector('.control-icon');
@@ -70,16 +70,16 @@ function toggleDevice(el, deviceType) {
 
     const icons = {
         light: { 
-            on: 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-light-on.svg', 
-            off: 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-light-off.svg' 
+            on: 'images/icons/icon-small-light-on.svg', 
+            off: 'images/icons/icon-small-light-off.svg' 
         },
         tv: { 
-            on: 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-tv-on.svg', 
-            off: 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-tv-off.svg' 
+            on: 'images/icons/icon-small-tv-on.svg', 
+            off: 'images/icons/icon-small-tv-off.svg' 
         },
         shader: { 
-            on: 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-shader-on.svg', 
-            off: 'https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-shader-off.svg'
+            on: 'images/icons/icon-small-shader-on.svg', 
+            off: 'images/icons/icon-small-shader-off.svg'
         }
     };
 
@@ -154,3 +154,4 @@ function sendHubitatCommand(deviceId, command, value) {
         .then(data => console.log('Resposta do Hubitat:', data))
         .catch(error => console.error('Erro ao enviar comando para o Hubitat:', error));
 }
+

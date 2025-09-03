@@ -139,6 +139,12 @@ html, body {
     background-repeat: no-repeat;
 }
 
+/* Headings em Raleway Medium */
+h1, h2, h3 {
+    font-family: 'Raleway', Arial, sans-serif;
+    font-weight: 500;
+}
+
 .container {
     width: 100%;
     max-width: 412px;
@@ -206,7 +212,7 @@ html, body {
     position: absolute;
     width: 112px;
     height: 52px;
-    background: url('https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/pageselector.svg') no-repeat center center / contain;
+    background: url('images/icons/pageselector.svg') no-repeat center center / contain;
     z-index: 2;
     top: -17px;
     left: calc(var(--indicator-left, 50%) - 56px);
@@ -340,6 +346,8 @@ html, body {
     gap: 10px;
     z-index: 1;
     align-items: center;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .control-card {
@@ -455,5 +463,6 @@ html, body {
     transform: translateY(2px) scale(0.96);
     filter: drop-shadow(0 2px 0 rgba(0,0,0,0.45)) brightness(1.1);
 }
+
 
 
