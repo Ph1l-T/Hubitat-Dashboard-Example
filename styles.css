@@ -1,4 +1,4 @@
-/* Fileira de ícones nos cards de cômodos */
+﻿/* Fileira de Ã­cones nos cards de cÃ´modos */
 .room-icons-row {
     position: absolute;
     left: 30px;
@@ -36,13 +36,27 @@
     box-sizing: border-box;
 }
 
-/* Lista de cômodos na Home */
+/* Lista de cÃ´modos na Home */
 .rooms-list {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 5px;
     margin-top: 0;
+}
+
+/* Responsivo: duas colunas em tablets/desktop */
+@media (min-width: 768px) {
+    .rooms-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        align-items: stretch;
+        padding: 0 16px;
+    }
+    .room-card {
+        width: 100%;
+    }
 }
 
 .room-card {
@@ -90,6 +104,21 @@
     margin-bottom: 10px;
 }
 
+/* Fixa o tÃ­tulo "Home" no cabeÃ§alho para nÃ£o se mover ao rolar */
+#home-page .page-title {
+    position: fixed;
+    top: 45px;               /* subiu 15px */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 412px;        /* seguir a largura do container */
+    z-index: 120;            /* acima do conteÃºdo rolÃ¡vel */
+    margin: 0;
+    pointer-events: auto;    /* mantÃ©m interaÃ§Ãµes, mas evita scroll por gesto */
+    touch-action: none;      /* impede que gestos de arrastar rolem a pÃ¡gina */
+    -ms-touch-action: none;  /* suporte adicional (Edge antigo) */
+}
+
 /* Estilos base */
 * {
     margin: 0;
@@ -118,7 +147,7 @@ html, body {
     padding-bottom: 90px; /* Space for navbar */
 }
 
-/* Estilos das páginas */
+/* Estilos das pÃ¡ginas */
 .page {
     display: none;
     opacity: 0;
@@ -154,6 +183,21 @@ html, body {
     --indicator-left: 50%;
     z-index: 1000;
     box-sizing: border-box;
+}
+
+/* Tablet/desktop layout: move navbar 50px up and round corners */
+@media (min-width: 768px) {
+    .navbar {
+        bottom: 50px;           /* raise 50px from bottom */
+        border-radius: 16px;    /* rounded corners on all sides */
+    }
+    /* Increase bottom space so content doesn't overlap elevated navbar */
+    .container {
+        padding-bottom: 140px;  /* 77px nav + extra margin */
+    }
+    .controls-grid {
+        bottom: 140px;          /* avoid overlap in inner pages grid */
+    }
 }
 
 /* Bolinha branca indicadora */
@@ -316,12 +360,20 @@ html, body {
     font-weight: 200;
     cursor: pointer;
     text-align: center;
-    transition: background 0.3s ease;
+    transition: background 0.2s ease, transform 0.08s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     height: 100%;
 }
 
 .control-card:hover {
     background: rgba(255, 255, 255, 0.2);
+}
+
+/* AparÃªncia de pressionado quando ligado */
+.control-card[data-state="on"] {
+    transform: translateY(2px);
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.35);
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.2);
 }
 
 .control-card.large {
@@ -384,3 +436,24 @@ html, body {
 .temp-increase {
     /* background-color: rgba(0, 255, 0, 0.1); */
 }
+
+
+/* Botões pequenos dos cômodos na Home: efeito pressionado quando ligados */
+.icon-toggle-light,
+.icon-toggle-tv,
+.icon-toggle-shader,
+.icon-toggle-smartglass,
+.icon-toggle-telamovel {
+    transition: transform 0.08s ease, filter 0.2s ease;
+}
+
+.icon-toggle-light[data-state='on'],
+.icon-toggle-tv[data-state='on'],
+.icon-toggle-shader[data-state='on'],
+.icon-toggle-smartglass[data-state='on'],
+.icon-toggle-telamovel[data-state='on'] {
+    transform: translateY(2px) scale(0.96);
+    filter: drop-shadow(0 2px 0 rgba(0,0,0,0.45)) brightness(1.1);
+}
+
+
