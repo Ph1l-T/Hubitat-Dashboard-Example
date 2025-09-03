@@ -39,6 +39,7 @@
             </div>
         </div>
     </nav>
+
     <script src="script.js"></script>
     <script>
     // --- SPA Core ---
@@ -63,7 +64,9 @@
                     <h1 class="page-title">Home</h1>
                     <div class="rooms-frame">
                         <div class="rooms-list">
-                            <div class="room-card"><img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/photos/Escritorio-photo.png" alt="Escritório"><span>Escritório</span>
+                            <div class="room-card">
+                                <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/photos/Escritorio-photo.png" alt="Escritório">
+                                <span>Escritório</span>
                                 <div class="room-icons-row" style="z-index:11; position:relative;">
                                     <div style="width: 100%; height: 100%; justify-content: flex-start; align-items: flex-start; gap: 35px; display: inline-flex">
                                         <div class="icon-toggle-light" data-state="off" data-device-ids="101,102" onclick="toggleLightIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
@@ -73,100 +76,19 @@
                                             <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-tv-off.svg" alt="TV" style="width: 100%; height: 100%; object-fit: contain; position: absolute; left: 0; top: 0;" />
                                         </div>
                                         <div class="icon-toggle-shader" data-state="off" onclick="toggleShaderIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
-                                            <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-shader-off.svg" alt="Shader" style="width: 100%; height: 100%; object-fit: contain; position: absolute; left: 0; top: 0;" />
+                                            <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-shader-off.svg" alt="Cortina" style="width: 100%; height: 100%; object-fit: contain; position: absolute; left: 0; top: 0;" />
                                         </div>
                                     </div>
                                 </div>
                                 <button class="room-card-link" onclick="spaNavigate('escritorio')" style="position:absolute;left:0;top:0;width:100%;height:100%;z-index:10;background:transparent;border:none;cursor:pointer;"></button>
                             </div>
-                            <div class="room-card"><img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/photos/projetos-photo.png" alt="Projetos"><span>Projetos</span>
+
+                            <div class="room-card">
+                                <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/photos/cinema-photo.png" alt="Cinema">
+                                <span>Cinema</span>
                                 <div class="room-icons-row">
                                     <div style="width: 100%; height: 100%; justify-content: flex-start; align-items: flex-start; gap: 35px; display: inline-flex">
-                                        <div class="icon-toggle-light" data-state="off" data-device-ids="101,102" onclick="toggleLightIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
-                                            <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-light-off.svg" alt="Luz" style="width: 100%; height: 100%; object-fit: contain; position: absolute; left: 0; top: 0;" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <button class="room-card-link" onclick="spaNavigate('projetos')" style="position:absolute;left:0;top:0;width:100%;height:100%;z-index:10;background:transparent;border:none;cursor:pointer;"></button>
-                            </div>
-                            <div class="room-card"><img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/photos/programacao-photo.png" alt="Programação"><span>Programação</span>
-                                <div class="room-icons-row">
-                                    <div style="width: 100%; height: 100%; justify-content: flex-start; align-items: flex-start; gap: 35px; display: inline-flex">
-                                        <div class="icon-toggle-light" data-state="off" data-device-ids="101,102" onclick="toggleLightIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
-                                            <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-light-off.svg" alt="Luz" style="width: 100%; height: 100%; object-fit: contain; position: absolute; left: 0; top: 0;" />
-                                        </div>
-                                        <div class="icon-toggle-tv" data-state="off" onclick="toggleTvIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
-                                            <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-tv-off.svg" alt="TV" style="width: 100%; height: 100%; object-fit: contain; position: absolute; left: 0; top: 0;" />
-                                        </div>
-                                        <div class="icon-toggle-smartglass" data-state="off" onclick="toggleSmartglassIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
-                                            <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-smartglass-off.svg" alt="Smartglass" style="width: 100%; height: 100%; object-fit: contain; position: absolute; left: 0; top: 0;" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <button class="room-card-link" onclick="spaNavigate('programacao')" style="position:absolute;left:0;top:0;width:100%;height:100%;z-index:10;background:transparent;border:none;cursor:pointer;"></button>
-                            </div>
-                            <div class="room-card"><img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/photos/sinuca-photo.png" alt="Sinuca"><span>Sinuca</span>
-                                <div class="room-icons-row">
-                                    <div style="width: 100%; height: 100%; justify-content: flex-start; align-items: flex-start; gap: 35px; display: inline-flex">
-                                        <div class="icon-toggle-light" data-state="off" data-device-ids="101,102" onclick="toggleLightIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
-                                            <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-light-off.svg" alt="Luz" style="width: 100%; height: 100%; object-fit: contain; position: absolute; left: 0; top: 0;" />
-                                        </div>
-                                        <div class="icon-toggle-tv" data-state="off" onclick="toggleTvIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
-                                            <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-tv-off.svg" alt="TV" style="width: 100%; height: 100%; object-fit: contain; position: absolute; left: 0; top: 0;" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <button class="room-card-link" onclick="spaNavigate('sinuca')" style="position:absolute;left:0;top:0;width:100%;height:100%;z-index:10;background:transparent;border:none;cursor:pointer;"></button>
-                            </div>
-                            <div class="room-card"><img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/photos/gourmet-photo.png" alt="Gourmet"><span>Gourmet</span>
-                                <div class="room-icons-row">
-                                    <div style="width: 100%; height: 100%; justify-content: flex-start; align-items: flex-start; gap: 35px; display: inline-flex">
-                                        <div class="icon-toggle-light" data-state="off" data-device-ids="101,102" onclick="toggleLightIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
-                                            <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-light-off.svg" alt="Luz" style="width: 100%; height: 100%; object-fit: contain; position: absolute; left: 0; top: 0;" />
-                                        </div>
-                                        <div class="icon-toggle-tv" data-state="off" onclick="toggleTvIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
-                                            <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-tv-off.svg" alt="TV" style="width: 100%; height: 100%; object-fit: contain; position: absolute; left: 0; top: 0;" />
-                                        </div>
-                                        <div class="icon-toggle-shader" data-state="off" onclick="toggleShaderIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
-                                            <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-shader-off.svg" alt="Shader" style="width: 100%; height: 100%; object-fit: contain; position: absolute; left: 0; top: 0;" />
-                                        </div>
-                                        <div class="icon-toggle-smartglass" data-state="off" onclick="toggleSmartglassIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
-                                            <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-smartglass-off.svg" alt="Smartglass" style="width: 100%; height: 100%; object-fit: contain; position: absolute; left: 0; top: 0;" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <button class="room-card-link" onclick="spaNavigate('gourmet')" style="position:absolute;left:0;top:0;width:100%;height:100%;z-index:10;background:transparent;border:none;cursor:pointer;"></button>
-                            </div>
-                            <div class="room-card"><img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/photos/home-photo.png" alt="Home"><span>Home</span>
-                                <div class="room-icons-row">
-                                    <div style="width: 100%; height: 100%; justify-content: flex-start; align-items: flex-start; gap: 35px; display: inline-flex">
-                                        <div class="icon-toggle-light" data-state="off" data-device-ids="101,102" onclick="toggleLightIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
-                                            <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-light-off.svg" alt="Luz" style="width: 100%; height: 100%; object-fit: contain; position: absolute; left: 0; top: 0;" />
-                                        </div>
-                                        <div class="icon-toggle-telamovel" data-state="off" onclick="toggleTelamovelIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
-                                            <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-telamovel-off.svg" alt="Telamovel" style="width: 100%; height: 100%; object-fit: contain; position: absolute; left: 0; top: 0;" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <button class="room-card-link" onclick="spaNavigate('homecard')" style="position:absolute;left:0;top:0;width:100%;height:100%;z-index:10;background:transparent;border:none;cursor:pointer;"></button>
-                            </div>
-                            <div class="room-card"><img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/photos/eletrize-solar-photo.png" alt="Eletrize Solar"><span>Eletrize Solar</span>
-                                <div class="room-icons-row">
-                                    <div style="width: 100%; height: 100%; justify-content: flex-start; align-items: flex-start; gap: 35px; display: inline-flex">
-                                        <div class="icon-toggle-light" data-state="off" data-device-ids="101,102" onclick="toggleLightIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
-                                            <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-light-off.svg" alt="Luz" style="width: 100%; height: 100%; object-fit: contain; position: absolute; left: 0; top: 0;" />
-                                        </div>
-                                        <div class="icon-toggle-tv" data-state="off" onclick="toggleTvIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
-                                            <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-tv-off.svg" alt="TV" style="width: 100%; height: 100%; object-fit: contain; position: absolute; left: 0; top: 0;" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <button class="room-card-link" onclick="spaNavigate('eletrizesolar')" style="position:absolute;left:0;top:0;width:100%;height:100%;z-index:10;background:transparent;border:none;cursor:pointer;"></button>
-                            </div>
-                            <div class="room-card"><img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/photos/cinema-photo.png" alt="Cinema"><span>Cinema</span>
-                                <div class="room-icons-row">
-                                    <div style="width: 100%; height: 100%; justify-content: flex-start; align-items: flex-start; gap: 35px; display: inline-flex">
-                                        <div class="icon-toggle-light" data-state="off" data-device-ids="101,102" onclick="toggleLightIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
+                                        <div class="icon-toggle-light" data-state="off" onclick="toggleLightIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
                                             <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-light-off.svg" alt="Luz" style="width: 100%; height: 100%; object-fit: contain; position: absolute; left: 0; top: 0;" />
                                         </div>
                                         <div class="icon-toggle-tv" data-state="off" onclick="toggleTvIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
@@ -176,10 +98,13 @@
                                 </div>
                                 <button class="room-card-link" onclick="spaNavigate('cinema')" style="position:absolute;left:0;top:0;width:100%;height:100%;z-index:10;background:transparent;border:none;cursor:pointer;"></button>
                             </div>
-                            <div class="room-card"><img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/photos/recepcao-photo.png" alt="Recepção"><span>Recepção</span>
+
+                            <div class="room-card">
+                                <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/photos/recepcao-photo.png" alt="Recepção">
+                                <span>Recepção</span>
                                 <div class="room-icons-row">
                                     <div style="width: 100%; height: 100%; justify-content: flex-start; align-items: flex-start; gap: 35px; display: inline-flex">
-                                        <div class="icon-toggle-light" data-state="off" data-device-ids="101,102" onclick="toggleLightIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
+                                        <div class="icon-toggle-light" data-state="off" onclick="toggleLightIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
                                             <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-light-off.svg" alt="Luz" style="width: 100%; height: 100%; object-fit: contain; position: absolute; left: 0; top: 0;" />
                                         </div>
                                         <div class="icon-toggle-tv" data-state="off" onclick="toggleTvIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
@@ -189,11 +114,13 @@
                                 </div>
                                 <button class="room-card-link" onclick="spaNavigate('recepcao')" style="position:absolute;left:0;top:0;width:100%;height:100%;z-index:10;background:transparent;border:none;cursor:pointer;"></button>
                             </div>
+
                         </div>
                     </div>
                 </div>
             </main>
         `,
+
         escritorio: () => `
 <div class="page active page-container" style="background-image: url('https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/photos/Escritorio-photo.png');">
     <div class="page-header">
@@ -201,12 +128,12 @@
         <h1 class="page-title">Escritório</h1>
     </div>
     <div class="controls-grid">
-        <div class="control-card small" data-state="off" onclick="toggleDevice(this, 'light')">
+        <div class="control-card small" data-state="off" data-device-id="102" onclick="toggleDevice(this, 'light')">
             <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-light-off.svg" class="control-icon">
             <div class="control-label">Pendente</div>
             <div class="control-state">OFF</div>
         </div>
-        <div class="control-card small" data-state="off" onclick="toggleDevice(this, 'light')">
+        <div class="control-card small" data-state="off" data-device-id="101" onclick="toggleDevice(this, 'light')">
             <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-light-off.svg" class="control-icon">
             <div class="control-label">Trilho</div>
             <div class="control-state">OFF</div>
@@ -241,6 +168,7 @@
     </div>
 </div>
         `,
+
         projetos: () => `
 <div class="page active page-container" style="background-image: url('https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/photos/projetos-photo.png');">
     <div class="page-header">
@@ -263,24 +191,49 @@
     </div>
 </div>
         `,
-        projetos: () => `
-<div class="page active page-container" style="background-image: url('https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/photos/projetos-photo.png');">
+
+        cinema: () => `
+<div class="page active page-container" style="background-image: url('https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/photos/cinema-photo.png');">
     <div class="page-header">
         <button class="back-btn" onclick="spaNavigate('home')"><img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-home.svg" alt="Voltar"></button>
-        <h1 class="page-title">Projetos</h1>
+        <h1 class="page-title">Cinema</h1>
     </div>
     <div class="controls-grid">
-        <div class="control-card small">
-            <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-light-off.svg" class="control-icon">
-            <div class="control-label">Projeto 1</div>
+        <div class="control-card large" data-state="off" onclick="toggleDevice(this, 'tv')">
+            <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-tv-off.svg" class="control-icon">
+            <div class="control-label">TV</div>
+            <div class="control-state">OFF</div>
         </div>
-        <div class="control-card small">
+        <div class="control-card small" data-state="off" onclick="toggleDevice(this, 'light')">
             <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-light-off.svg" class="control-icon">
-            <div class="control-label">Projeto 2</div>
+            <div class="control-label">Luz Ambiente</div>
+            <div class="control-state">OFF</div>
         </div>
-        <div class="control-card small">
+        <div class="control-card small" data-state="closed" onclick="toggleDevice(this, 'shader')">
+            <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-shader-off.svg" class="control-icon">
+            <div class="control-label">Cortinas</div>
+            <div class="control-state">Fechadas</div>
+        </div>
+    </div>
+</div>
+        `,
+
+        recepcao: () => `
+<div class="page active page-container" style="background-image: url('https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/photos/recepcao-photo.png');">
+    <div class="page-header">
+        <button class="back-btn" onclick="spaNavigate('home')"><img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-home.svg" alt="Voltar"></button>
+        <h1 class="page-title">Recepção</h1>
+    </div>
+    <div class="controls-grid">
+        <div class="control-card small" data-state="off" onclick="toggleDevice(this, 'light')">
             <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-light-off.svg" class="control-icon">
-            <div class="control-label">Projeto 3</div>
+            <div class="control-label">Luz</div>
+            <div class="control-state">OFF</div>
+        </div>
+        <div class="control-card small" data-state="off" onclick="toggleDevice(this, 'tv')">
+            <img src="https://cdn.jsdelivr.net/gh/Ph1l-T/My-Dashboard-Hubitat@main/images/icons/icon-small-tv-off.svg" class="control-icon">
+            <div class="control-label">TV</div>
+            <div class="control-state">OFF</div>
         </div>
     </div>
 </div>
@@ -293,27 +246,28 @@
 
     function renderSpa() {
         let page = window.location.hash.replace('#', '') || 'home';
-        // Sempre manter o ícone de Home ativo na página do escritório
-        let navPage = page === 'escritorio' ? 'home' : page;
         if (!pages[page]) page = 'home';
         spaRoot.innerHTML = pages[page]();
+
         // Atualiza navbar
         const nav = document.getElementById('spa-navbar');
         const items = nav.querySelectorAll('.nav-item');
-        let activeIndex = 0;
+        const navPages = Array.from(items).map(i => i.getAttribute('data-page'));
+
+        // Mantém o Home ativo para páginas que não estão na navbar (cômodos)
+        const navPage = navPages.includes(page) ? page : 'home';
+        let activeIndex = navPages.indexOf(navPage);
+        if (activeIndex < 0) activeIndex = navPages.indexOf('home');
+
         items.forEach((item, idx) => {
-            item.classList.remove('active');
-            if (item.getAttribute('data-page') === navPage || (navPage === 'home' && item.getAttribute('data-page') === 'home')) {
-                item.classList.add('active');
-                activeIndex = idx;
-            }
+            item.classList.toggle('active', idx === activeIndex);
         });
+
         // Move indicador (bolinha) dinamicamente
         const activeItem = items[activeIndex];
         if (activeItem) {
             const navRect = nav.getBoundingClientRect();
             const itemRect = activeItem.getBoundingClientRect();
-            // Posição central do ícone ativo relativa à navbar
             const center = itemRect.left + itemRect.width / 2 - navRect.left;
             nav.style.setProperty('--indicator-left', `${center}px`);
         }

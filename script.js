@@ -85,15 +85,15 @@ function toggleDevice(el, deviceType) {
 
     if (!icons[deviceType]) return;
 
-    let deviceId;
-    // IDs fornecidos: Trilho = 101, Pendente = 102
-    const controlLabel = el.querySelector('.control-label').textContent;
-    if (controlLabel === 'Pendente') {
-        deviceId = '102';
-    } else if (controlLabel === 'Trilho') {
-        deviceId = '101';
-    } else {
-        deviceId = null;
+    let deviceId = el.dataset.deviceId || null;
+    // Fallback por label para compatibilidade
+    if (!deviceId) {
+        const controlLabel = el.querySelector('.control-label')?.textContent?.trim();
+        if (controlLabel === 'Pendente') {
+            deviceId = '102';
+        } else if (controlLabel === 'Trilho') {
+            deviceId = '101';
+        }
     }
 
     if (currentState === 'off' || currentState === 'closed') {
