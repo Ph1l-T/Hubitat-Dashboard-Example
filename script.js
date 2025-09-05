@@ -495,4 +495,209 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Polling de segurança (caso SSE não conecte)
     startPolling(POLL_INTERVAL_MS);
+
+    // Esconder controles que não são de luz (sem data-device-id),
+    // exceto os marcados explicitamente como permitidos
+    const hideNonLightControlsInDOM = () => {
+        try {
+            document.querySelectorAll('.control-card:not([data-device-id]):not([data-allow-non-light="true"])').forEach((el) => {
+                el.style.display = 'none';
+            });
+        } catch (_) {}
+    };
+
+    const root = document.getElementById('spa-root');
+    hideNonLightControlsInDOM();
+    if (root) {
+        const mo = new MutationObserver(() => hideNonLightControlsInDOM());
+        mo.observe(root, { childList: true, subtree: true });
+    }
+
+    // Define página de Cenários com Master ON/OFF, se disponível
+    try {
+        if (typeof pages !== 'undefined' && pages && typeof pages === 'object') {
+            pages.scenes = scenesMarkup;
+        }
+    } catch (_) {}
+    // Após render inicial, se estiver na página de cenários, garante conteúdo
+    setTimeout(maybeOverrideScenes, 0);
 });
+
+// --- Master ON/OFF (Cenários) ---
+
+// Lista consolidada das luzes mapeadas na UI (relayboard 133–147, em uso):
+const KNOWN_LIGHT_IDS = [
+    '133','134','135','136','137','138','139','140','141','142','143','144','145','146','147'
+];
+
+function getAllKnownLightIds() {
+    const ids = new Set(KNOWN_LIGHT_IDS);
+    // Adiciona quaisquer IDs presentes no DOM atual
+    try {
+        collectAllDeviceIdsFromDOM().forEach((id) => ids.add(String(id)));
+    } catch (_) {}
+    return Array.from(ids);
+}
+
+function anyKnownLightOn() {
+    const ids = getAllKnownLightIds();
+    for (const id of ids) {
+        const info = deviceStateCache.get(String(id));
+        const mapped = mapStateForDeviceType(info, 'light');
+        if (mapped === 'on') return true;
+    }
+    return false;
+}
+
+function openMasterConfirmModal() {
+    // Decide ação com base no estado atual
+    const anyOn = anyKnownLightOn();
+    const action = anyOn ? 'off' : 'on';
+    window.__masterAction = action;
+    const modal = document.getElementById('master-modal');
+    const msg = document.getElementById('master-modal-message');
+    const title = document.getElementById('master-modal-title');
+    if (modal && msg && title) {
+        title.textContent = 'Confirmação';
+        msg.textContent = action === 'off' ? 'Deseja Desligar tudo?' : 'Deseja Ligar tudo?';
+        modal.classList.add('show');
+    }
+}
+
+function closeMasterModal() {
+    const modal = document.getElementById('master-modal');
+    if (modal) modal.classList.remove('show');
+}
+
+function executeMasterFromModal() {
+    const action = window.__masterAction === 'off' ? 'off' : 'on';
+    const ids = getAllKnownLightIds();
+    for (const id of ids) {
+        try {
+            // Atualiza cache local para feedback imediato
+            const key = String(id);
+            const info = deviceStateCache.get(key) || { raw: null, switch: undefined, windowShade: undefined };
+            info.switch = action;
+            deviceStateCache.set(key, info);
+            sendHubitatCommand(id, action);
+        } catch (_) {}
+    }
+    try { syncAllElementsFromCache(); } catch (_) {}
+    closeMasterModal();
+}
+
+function renderScenesOverrideIntoRoot() {
+    const root = document.getElementById('spa-root');
+    if (!root) return;
+    root.innerHTML = scenesMarkup();
+}
+
+function maybeOverrideScenes() {
+    const page = (location.hash || '').replace('#','') || 'home';
+    if (page === 'scenes') {
+        renderScenesOverrideIntoRoot();
+        // Garante sincronização de estados após montar a página
+        refreshAllDeviceStates(true).catch(() => {});
+    }
+}
+
+window.addEventListener('hashchange', maybeOverrideScenes);
+
+// Gera o markup da página de Cenários
+function scenesMarkup() {
+    return `
+<div class="page active page-container" style="background-image: url('images/photos/home-photo.png');">
+  <div class="page-header">
+    <h1 class="page-title">Cenários</h1>
+  </div>
+  <div class="controls-grid">
+    <div class="control-card large master-toggle" data-allow-non-light="true" onclick="openMasterConfirmModal()">
+      <img src="images/icons/icon-small-light-off.svg" class="control-icon">
+      <div class="control-label">Master ON/OFF</div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="master-modal">
+    <div class="modal">
+      <div class="modal-title" id="master-modal-title">Confirmação</div>
+      <div class="modal-message" id="master-modal-message">...</div>
+      <div class="modal-actions">
+        <button class="btn cancel" onclick="closeMasterModal()">Cancelar</button>
+        <button class="btn execute" onclick="executeMasterFromModal()">Executar</button>
+      </div>
+    </div>
+  </div>
+</div>`;
+}
+
+// --- TV Remote handlers ---
+
+function handleRemoteClick(btn) {
+    try {
+        const container = btn.closest('#tv-remote');
+        const tvId = (container && container.getAttribute('data-tv-id')) || '142';
+        const cmd = btn.getAttribute('data-cmd');
+        const val = btn.getAttribute('data-val');
+
+        // Map UI commands to Hubitat-style commands where possível
+        // Preferir comandos suportados pelo device TV (id 149): on/off/mute/volume/channel, e fallback para 'push'
+        const map = {
+            power: ['on'],
+            mute: ['mute'],
+            volUp: ['volumeUp'],
+            volDown: ['volumeDown'],
+            chUp: ['channelUp'],
+            chDown: ['channelDown'],
+        };
+
+        if (cmd === 'num' && val != null) {
+            console.log('Remote num', val);
+            // Fallback universal: usar 'push' com o dígito se suportado
+            try { sendHubitatCommand(tvId, 'push', String(val)); } catch (_) {}
+            return;
+        }
+        if (cmd === 'num100') { try { sendHubitatCommand(tvId, 'push', '100'); } catch (_) {} return; }
+        if (cmd === 'back') { try { sendHubitatCommand(tvId, 'push', 'back'); } catch (_) {} return; }
+        if (['menu','service','input','up','down','left','right','ok'].includes(cmd)) {
+            try { sendHubitatCommand(tvId, 'push', cmd); } catch (_) {}
+            return;
+        }
+
+        const targets = map[cmd];
+        if (targets && targets.length) {
+            for (const c of targets) {
+                try { sendHubitatCommand(tvId, c); } catch (_) {}
+            }
+            return;
+        }
+
+        // Fallback: log
+        console.log('Remote button pressed:', { tvId, cmd, val });
+    } catch (e) {
+        console.error('handleRemoteClick failed', e);
+    }
+}
+
+// --- AC helpers ---
+function acSetPower(deviceId, on) {
+    sendHubitatCommand(deviceId, on ? 'on' : 'off');
+}
+function acSetMode(deviceId, mode) {
+    // comandos do device aceitam 'auto','cool','heat','off'
+    sendHubitatCommand(deviceId, mode);
+}
+function acSetFanMode(deviceId, mode) {
+    if (mode === 'auto') return sendHubitatCommand(deviceId, 'fanAuto');
+    if (mode === 'on') return sendHubitatCommand(deviceId, 'fanOn');
+    return sendHubitatCommand(deviceId, 'setThermostatFanMode', mode);
+}
+function acAdjustCoolingSetpoint(deviceId, delta) {
+    const disp = document.getElementById('ac-setpoint-display');
+    let current = 20;
+    if (disp) {
+        const m = /([0-9]+)(?:\s*°?C)?/i.exec(disp.textContent || '');
+        if (m) current = parseInt(m[1], 10);
+    }
+    const next = Math.max(16, Math.min(30, current + (delta||0)));
+    if (disp) disp.textContent = `${next}°C`;
+    sendHubitatCommand(deviceId, 'setCoolingSetpoint', String(next));
+}

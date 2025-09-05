@@ -3,7 +3,7 @@
     position: absolute;
     left: 30px;
     top: 240px;
-    z-index: 2;
+    z-index: 20; /* acima do overlay de navegação (z-index:10) */
     width: auto;
     height: auto;
 }
@@ -494,4 +494,176 @@ h1, h2, h3 {
     font-weight: 500;
     font-display: swap;
     src: url('fonts/raleway/Raleway-500.woff2') format('woff2');
+}
+
+/* --- Modal (cenários) --- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+}
+.modal-overlay.show { display: flex; animation: fadeIn 150ms ease-out; }
+.modal {
+    width: 90%;
+    max-width: 360px;
+    background: #1e1e1e;
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    transform: scale(0.96);
+    animation: popIn 150ms ease-out forwards;
+}
+.modal-title { font-size: 18px; margin-bottom: 8px; color: #fff; text-align: center; }
+.modal-message { color: #ddd; text-align: center; margin-bottom: 14px; }
+.modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.modal-actions .btn { height: 44px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: #fff; cursor: pointer; }
+.modal-actions .btn.execute { background: #7a4ef3; border-color: rgba(255,255,255,0.3); }
+
+@keyframes popIn {
+    from { transform: scale(0.96); opacity: .0; }
+    to { transform: scale(1); opacity: 1; }
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* --- TV Remote Layout --- */
+.remote-wrapper {
+    position: absolute;
+    top: 115px;
+    left: 21px;
+    right: 21px;
+    bottom: 90px; /* navbar */
+    display: grid;
+    place-items: center;
+    overflow-y: auto; /* mobile pode rolar */
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+.remote {
+    width: 92%;
+    max-width: 980px;
+    max-height: calc(100% - 16px); /* diminui frame p/ não colidir com navbar */
+    background: rgba(255,255,255,0.08);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 18px;
+    padding: 12px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+        'top top top'
+        'vol dpad ch'
+        'keypad keypad keypad'
+        'menu menu menu';
+    gap: 12px;
+    color: #fff;
+    font-family: 'Raleway', sans-serif;
+    box-sizing: border-box;
+    /* Tamanhos padrão dos botões (mobile) */
+    --btn-std: 44px;
+    --btn-large: 72px;
+}
+
+.area-top { grid-area: top; }
+.area-dpad { grid-area: dpad; }
+.area-right { grid-area: right; }
+.area-keypad { grid-area: keypad; }
+.area-menu { grid-area: menu; }
+.area-vol { grid-area: vol; }
+.area-ch { grid-area: ch; }
+
+.remote-keypad,
+.left-keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 8px;
+    min-height: 0;
+    grid-auto-rows: var(--btn-std);
+}
+
+.left-top { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.left-top.two-cols { grid-template-columns: repeat(2, 1fr); }
+
+.remote-menu-row, .left-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; grid-auto-rows: var(--btn-std); }
+
+.right-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+.right-bottom .vert-group { display: grid; grid-template-rows: auto 1fr 1fr; gap: 6px; justify-items: center; }
+
+.remote-btn {
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: #fff;
+    border-radius: 12px;
+    height: 100%;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.08s ease, background 0.2s ease, border-color 0.2s ease;
+    padding: 0 10px;
+}
+
+.remote-btn.small { font-size: 14px; }
+.remote-btn.btn-std { height: var(--btn-std); }
+.remote-btn.power { background: rgba(210, 53, 53, 0.8); border-color: rgba(255,255,255,0.25); }
+.remote-btn:active { transform: translateY(2px) scale(0.98); }
+
+.side-block { display: grid; grid-template-rows: auto 1fr 1fr; gap: 6px; justify-items: center; min-height: 0; }
+.side-label { font-size: 12px; opacity: 0.9; }
+.remote-btn.side { width: var(--btn-large); height: var(--btn-large); font-size: 18px; }
+
+.dpad { display: grid; grid-template-columns: var(--btn-large) var(--btn-large) var(--btn-large); grid-template-rows: var(--btn-large) var(--btn-large) var(--btn-large); gap: 6px; justify-content: center; }
+.dpad-btn { height: var(--btn-large); border-radius: 50%; font-size: 18px; }
+.dpad-btn.ok { font-weight: 500; }
+
+/* Desktop layout */
+@media (min-width: 900px) {
+    .remote-wrapper { overflow: hidden; }
+    .remote {
+        /* Simplificado (sem dpad/numerico): top acima, vol/ch lado a lado */
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto 1fr;
+        grid-template-areas:
+            'top top'
+            'vol ch';
+        --btn-std: 50px;
+        --btn-large: 84px;
+        max-height: calc(100% - 16px);
+    }
+
+    .left-top { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; grid-auto-rows: var(--btn-std); justify-items: stretch; }
+    .area-dpad { align-self: stretch; }
+    .dpad { height: 100%; }
+    /* VOL/CH já posicionados em colunas separadas (vol/ch) */
+}
+
+/* Mobile: permite conteúdo maior e rolagem no wrapper */
+@media (max-width: 899px) {
+    .remote {
+        max-height: none;
+        height: auto;
+        /* Mobile portrait: top e VOL/CH lado a lado */
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto 1fr;
+        grid-template-areas:
+            'top top'
+            'vol ch';
+        gap: 8px;
+        /* Compacto para 412x915 */
+        --btn-std: 40px;
+        --btn-large: 54px;
+    }
+    .remote-wrapper { overflow-y: auto; }
 }
