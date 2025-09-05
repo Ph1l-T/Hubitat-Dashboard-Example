@@ -41,6 +41,11 @@
         </div>
     </nav>
 
+    <script>
+        // Cloud proxy for Hubitat (GitHub Pages / Public)
+        window.USE_HUBITAT_PROXY = true;
+        window.HUBITAT_PROXY_BASE_URL = 'https://hubitat-proxy.philipe2017s.workers.dev/hubitat/devices/';
+    </script>
     <script src="script.js"></script>
     <script>
     // --- SPA Core ---
@@ -70,7 +75,7 @@
                                 <span>Escritório</span>
                                 <div class="room-icons-row" style="z-index:11; position:relative;">
                                     <div style="width: 100%; height: 100%; justify-content: flex-start; align-items: flex-start; gap: 35px; display: inline-flex">
-                                        <div class="icon-toggle-light" data-state="off" data-device-ids="101,102" onclick="toggleLightIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
+                                        <div class="icon-toggle-light" data-state="off" data-device-ids="133,134" onclick="toggleLightIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
                                             <img src="images/icons/icon-small-light-off.svg" alt="Luz" style="width: 100%; height: 100%; object-fit: contain; position: absolute; left: 0; top: 0;" />
                                         </div>
                                         <div class="icon-toggle-tv" data-state="off" onclick="toggleTvIcon(this)" style="width: 42px; height: 42px; position: relative; cursor: pointer;">
@@ -129,12 +134,12 @@
         <h1 class="page-title">Escritório</h1>
     </div>
     <div class="controls-grid">
-        <div class="control-card small" data-state="off" data-device-id="102" onclick="toggleDevice(this, 'light')">
+        <div class="control-card small" data-state="off" data-device-id="134" onclick="toggleDevice(this, 'light')">
             <img src="images/icons/icon-small-light-off.svg" class="control-icon">
             <div class="control-label">Pendente</div>
             <div class="control-state">OFF</div>
         </div>
-        <div class="control-card small" data-state="off" data-device-id="101" onclick="toggleDevice(this, 'light')">
+        <div class="control-card small" data-state="off" data-device-id="133" onclick="toggleDevice(this, 'light')">
             <img src="images/icons/icon-small-light-off.svg" class="control-icon">
             <div class="control-label">Trilho</div>
             <div class="control-state">OFF</div>
@@ -279,6 +284,7 @@
         }
 
         // Sincroniza estados reais dos dispositivos após montar a página
+        if (typeof syncAllElementsFromCache === 'function') { try { syncAllElementsFromCache(); } catch (e) { console.error('Falha ao aplicar cache apos render', e); } }
         if (typeof refreshAllDeviceStates === 'function') {
             try { refreshAllDeviceStates(true); } catch (e) { console.error('Falha ao sincronizar após render', e); }
         }

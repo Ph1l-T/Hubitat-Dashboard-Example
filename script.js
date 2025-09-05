@@ -40,11 +40,28 @@ function toggleLightIcon(el) {
     if (el.dataset.state === 'off') {
         img.src = 'images/icons/icon-small-light-on.svg';
         el.dataset.state = 'on';
-        deviceIds.forEach(id => sendHubitatCommand(id, 'on'));
+        // Atualiza cache local imediato e envia comando
+        deviceIds.forEach(id => {
+            // Atualiza cache de estado de switch
+            const key = String(id).trim();
+            const info = deviceStateCache.get(key) || { raw: null, switch: undefined, windowShade: undefined };
+            info.switch = 'on';
+            deviceStateCache.set(key, info);
+            sendHubitatCommand(id, 'on');
+        });
+        // Reaplica estados em todos elementos (ex.: outras páginas/ícones)
+        if (typeof syncAllElementsFromCache === 'function') try { syncAllElementsFromCache(); } catch (_) {}
     } else {
         img.src = 'images/icons/icon-small-light-off.svg';
         el.dataset.state = 'off';
-        deviceIds.forEach(id => sendHubitatCommand(id, 'off'));
+        deviceIds.forEach(id => {
+            const key = String(id).trim();
+            const info = deviceStateCache.get(key) || { raw: null, switch: undefined, windowShade: undefined };
+            info.switch = 'off';
+            deviceStateCache.set(key, info);
+            sendHubitatCommand(id, 'off');
+        });
+        if (typeof syncAllElementsFromCache === 'function') try { syncAllElementsFromCache(); } catch (_) {}
     }
 }
 
@@ -90,9 +107,9 @@ function toggleDevice(el, deviceType) {
     if (!deviceId) {
         const controlLabel = el.querySelector('.control-label')?.textContent?.trim();
         if (controlLabel === 'Pendente') {
-            deviceId = '102';
+            deviceId = '134';
         } else if (controlLabel === 'Trilho') {
-            deviceId = '101';
+            deviceId = '133';
         }
     }
 
@@ -100,16 +117,40 @@ function toggleDevice(el, deviceType) {
         newState = 'on';
         newLabel = deviceType === 'shader' ? 'Abertas' : 'ON';
         img.src = icons[deviceType].on;
-        if (deviceId) sendHubitatCommand(deviceId, 'on');
+        // Atualiza cache local e envia comando
+        if (deviceId) {
+            const key = String(deviceId);
+            const info = deviceStateCache.get(key) || { raw: null, switch: undefined, windowShade: undefined };
+            if (deviceType === 'shader') {
+                info.windowShade = 'open';
+            } else {
+                info.switch = 'on';
+            }
+            deviceStateCache.set(key, info);
+            sendHubitatCommand(deviceId, 'on');
+        }
     } else {
         newState = deviceType === 'shader' ? 'closed' : 'off';
         newLabel = deviceType === 'shader' ? 'Fechadas' : 'OFF';
         img.src = icons[deviceType].off;
-        if (deviceId) sendHubitatCommand(deviceId, 'off');
+        if (deviceId) {
+            const key = String(deviceId);
+            const info = deviceStateCache.get(key) || { raw: null, switch: undefined, windowShade: undefined };
+            if (deviceType === 'shader') {
+                info.windowShade = 'closed';
+            } else {
+                info.switch = 'off';
+            }
+            deviceStateCache.set(key, info);
+            sendHubitatCommand(deviceId, 'off');
+        }
     }
 
     el.dataset.state = newState;
     if (stateEl) stateEl.textContent = newLabel;
+
+    // Sincroniza demais elementos imediatamente a partir do cache
+    if (typeof syncAllElementsFromCache === 'function') try { syncAllElementsFromCache(); } catch (_) {}
 }
 
 function setupThermostat() {
@@ -139,13 +180,24 @@ function setupThermostat() {
 
 // --- Controle do Hubitat ---
 
+// Prefer using a proxy to avoid CORS issues
+// You can override at runtime via window.USE_HUBITAT_PROXY and window.HUBITAT_PROXY_BASE_URL
+const USE_HUBITAT_PROXY = (typeof window !== 'undefined' && 'USE_HUBITAT_PROXY' in window) ? !!window.USE_HUBITAT_PROXY : true;
+const HUBITAT_PROXY_BASE_URL = (typeof window !== 'undefined' && window.HUBITAT_PROXY_BASE_URL) ? window.HUBITAT_PROXY_BASE_URL : '/hubitat/devices/';
+// Direct cloud (fallback if you disable the proxy)
 const HUBITAT_CLOUD_BASE_URL = 'https://cloud.hubitat.com/api/e45cb756-9028-44c2-8a00-e6fb3651856c/apps/77/devices/';
 const HUBITAT_ACCESS_TOKEN = '759c4ea4-f9c5-4250-bd11-131221eaad76';
 
 function sendHubitatCommand(deviceId, command, value) {
-    let url = `${HUBITAT_CLOUD_BASE_URL}${deviceId}/${command}`;
-    if (value) url += `/${value}`;
-    url += `?access_token=${HUBITAT_ACCESS_TOKEN}`;
+    let url;
+    if (USE_HUBITAT_PROXY) {
+        url = `${HUBITAT_PROXY_BASE_URL}${deviceId}/${command}`;
+        if (value) url += `/${value}`;
+    } else {
+        url = `${HUBITAT_CLOUD_BASE_URL}${deviceId}/${command}`;
+        if (value) url += `/${value}`;
+        url += `?access_token=${HUBITAT_ACCESS_TOKEN}`;
+    }
 
     console.log(`Enviando comando para o Hubitat: ${url}`);
 
@@ -155,14 +207,12 @@ function sendHubitatCommand(deviceId, command, value) {
         .catch(error => console.error('Erro ao enviar comando para o Hubitat:', error));
 }
 
-// --- Sincronização de estado inicial com o Hubitat ---
-
 // Cache simples em memória para evitar requisições repetidas na carga
 const deviceStateCache = new Map(); // Map<deviceId, { raw: object, switch: 'on'|'off'|undefined, windowShade: string|undefined }>
 
 function fetchHubitatDeviceInfo(deviceId) {
-    const url = `${HUBITAT_CLOUD_BASE_URL}${deviceId}?access_token=${HUBITAT_ACCESS_TOKEN}`;
-    return fetch(url)
+    const url = USE_HUBITAT_PROXY ? `${HUBITAT_PROXY_BASE_URL}${deviceId}` : `${HUBITAT_CLOUD_BASE_URL}${deviceId}?access_token=${HUBITAT_ACCESS_TOKEN}`;
+    return fetch(url, { cache: 'no-store' })
         .then((res) => (res.ok ? res.json() : Promise.reject(res)))
         .then((data) => {
             // Normaliza atributos úteis
@@ -290,33 +340,43 @@ function syncAllElementsFromCache() {
     document.querySelectorAll('[data-device-id], [data-device-ids]').forEach((el) => syncElementFromCache(el));
 }
 
+let __isRefreshingStates = false;
 function refreshAllDeviceStates(force = false) {
     const ids = Array.from(collectAllDeviceIdsFromDOM());
     if (ids.length === 0) return Promise.resolve();
+    if (__isRefreshingStates) return Promise.resolve();
+    __isRefreshingStates = true;
     const fetcher = force ? fetchHubitatDeviceInfo : getCachedOrFetch;
-    return Promise.all(ids.map((id) => fetcher(id))).then(() => {
-        syncAllElementsFromCache();
-    });
+    return Promise.all(ids.map((id) => fetcher(id)))
+        .then(() => {
+            syncAllElementsFromCache();
+        })
+        .finally(() => { __isRefreshingStates = false; });
 }
 
 // --- Event Stream (SSE) para atualização imediata ---
 
 // Tenta descobrir automaticamente URLs comuns para stream de eventos do Maker API
 function buildHubitatEventUrlCandidates() {
+    if (USE_HUBITAT_PROXY) {
+        const base = String(HUBITAT_PROXY_BASE_URL || '');
+        const devicesBase = /\/devices\/$/i.test(base)
+            ? base
+            : (base.endsWith('/') ? base + 'devices/' : base + '/devices/');
+        const rootBase = devicesBase.replace(/\/devices\/??$/i, '/');
+        const watchUrl = devicesBase + 'watch';
+        const eventSocketUrl = rootBase + 'eventsocket';
+        return [watchUrl, eventSocketUrl];
+    }
     const base = HUBITAT_CLOUD_BASE_URL.replace(/\/?devices\/??$/i, '');
     const tokenQS = `access_token=${encodeURIComponent(HUBITAT_ACCESS_TOKEN)}`;
     const candidates = [];
-    // Cloud Maker API (SSE)
     candidates.push(`${base}/devices/watch?${tokenQS}`);
-    // Event socket (algumas instalações expõem como SSE)
     candidates.push(`${base}/eventsocket?${tokenQS}`);
-    // Fallbacks conservadores
     candidates.push(`${HUBITAT_CLOUD_BASE_URL}watch?${tokenQS}`);
     candidates.push(`${HUBITAT_CLOUD_BASE_URL}eventsocket?${tokenQS}`);
     return Array.from(new Set(candidates));
 }
-
-let hubitatEventSource = null;
 let eventStreamConnected = false;
 let pollTimer = null;
 
@@ -357,7 +417,7 @@ function connectHubitatEvents() {
     const tryNext = () => {
         if (index >= candidates.length) {
             // Nenhuma URL funcionou: usa polling rápido
-            if (!pollTimer) startPolling(2000);
+            startPolling(POLL_INTERVAL_MS);
             return;
         }
         const url = candidates[index++];
@@ -369,8 +429,8 @@ function connectHubitatEvents() {
                 eventStreamConnected = true;
                 hubitatEventSource = es;
                 console.log('SSE conectado:', url);
-                // Conectou: podemos usar polling lento como backup
-                startPolling(15000);
+                // Mantemos polling como backup para garantir feedback
+                startPolling(POLL_INTERVAL_MS);
             };
             es.onerror = (err) => {
                 console.warn('Falha SSE, tentando próxima URL...', url, err);
@@ -412,7 +472,7 @@ function connectHubitatEvents() {
     tryNext();
 }
 
-const POLL_INTERVAL_MS = 10000; // 10s (usado se SSE indisponível)
+const POLL_INTERVAL_MS = 1000; // 1s para feedback quase imediato
 
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
