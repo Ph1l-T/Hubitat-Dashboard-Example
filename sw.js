@@ -1,4 +1,4 @@
-const CACHE_NAME = 'eletrize-cache-v1';
+const CACHE_NAME = 'eletrize-cache-v2';
 const CORE_ASSETS = [
   '/',
   '/index.html',

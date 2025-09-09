@@ -1,0 +1,24 @@
+{
+  "name": "hubitat-dashboard-example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ph1l-T/Hubitat-Dashboard-Example.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ph1l-T/Hubitat-Dashboard-Example/issues"
+  },
+  "homepage": "https://github.com/Ph1l-T/Hubitat-Dashboard-Example#readme",
+  "dependencies": {
+    "sharp": "0.34.3"
+  }
+}
