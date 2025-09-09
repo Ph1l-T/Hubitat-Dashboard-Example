@@ -379,6 +379,8 @@ function buildHubitatEventUrlCandidates() {
 }
 let eventStreamConnected = false;
 let pollTimer = null;
+// Global EventSource handle for SSE; avoids ReferenceError
+let hubitatEventSource = null;
 
 function stopPolling() {
     if (pollTimer) {
@@ -405,6 +407,12 @@ function updateCacheFromEvent(evt) {
 }
 
 function connectHubitatEvents() {
+    // If EventSource is unavailable (very old browsers), fallback to polling only
+    if (typeof EventSource === 'undefined') {
+        console.warn('EventSource not supported; using polling only');
+        startPolling(POLL_INTERVAL_MS);
+        return;
+    }
     if (hubitatEventSource) {
         try { hubitatEventSource.close(); } catch (_) {}
         hubitatEventSource = null;
