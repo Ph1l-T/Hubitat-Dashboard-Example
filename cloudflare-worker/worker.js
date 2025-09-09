@@ -54,9 +54,32 @@ export default {
       cf: { cacheTtl: 0, cacheEverything: false },
     };
 
+    // Small retry helper for transient upstream timeouts
+    async function fetchWithRetry(u, init, attempts = 3, backoffMs = 300) {
+      let lastErr;
+      for (let i = 0; i < attempts; i++) {
+        try {
+          const r = await fetch(u, init);
+          // retry on 502/503/504
+          if (r.status === 502 || r.status === 503 || r.status === 504) {
+            lastErr = new Error('upstream ' + r.status);
+          } else {
+            return r;
+          }
+        } catch (e) {
+          lastErr = e;
+        }
+        // backoff before next try
+        if (i < attempts - 1) await new Promise((res) => setTimeout(res, backoffMs * (i + 1)));
+      }
+      throw lastErr || new Error('upstream error');
+    }
+
     let resp;
     try {
-      resp = await fetch(target.toString(), init);
+      // For command-like endpoints, allow some retries
+      const isCommand = /\/devices\/\d+\/(on|off|set|push|mute|volume|channel|open|close|start|stop)/i.test(restPath);
+      resp = isCommand ? await fetchWithRetry(target.toString(), init) : await fetch(target.toString(), init);
     } catch (e) {
       return json({ error: 'upstream_fetch_failed', detail: String(e) }, 502);
     }

@@ -184,6 +184,7 @@ function setupThermostat() {
 // You can override at runtime via window.USE_HUBITAT_PROXY and window.HUBITAT_PROXY_BASE_URL
 const USE_HUBITAT_PROXY = (typeof window !== 'undefined' && 'USE_HUBITAT_PROXY' in window) ? !!window.USE_HUBITAT_PROXY : true;
 const HUBITAT_PROXY_BASE_URL = (typeof window !== 'undefined' && window.HUBITAT_PROXY_BASE_URL) ? window.HUBITAT_PROXY_BASE_URL : '/hubitat/devices/';
+const ALLOW_DIRECT_FALLBACK = false; // evitar CORS noise; use somente o proxy
 // Direct cloud (fallback if you disable the proxy)
 const HUBITAT_CLOUD_BASE_URL = 'https://cloud.hubitat.com/api/e45cb756-9028-44c2-8a00-e6fb3651856c/apps/77/devices/';
 const HUBITAT_ACCESS_TOKEN = '759c4ea4-f9c5-4250-bd11-131221eaad76';
@@ -202,7 +203,7 @@ function sendHubitatCommand(deviceId, command, value) {
     };
 
     const primaryUrl = USE_HUBITAT_PROXY ? buildProxy() : buildDirect();
-    const fallbackUrl = USE_HUBITAT_PROXY ? buildDirect() : null;
+    const fallbackUrl = (USE_HUBITAT_PROXY && ALLOW_DIRECT_FALLBACK) ? buildDirect() : null;
 
     console.log(`Enviando comando para o Hubitat: ${primaryUrl}`);
 
@@ -227,7 +228,7 @@ function fetchHubitatDeviceInfo(deviceId) {
     const proxyUrl = `${HUBITAT_PROXY_BASE_URL}${deviceId}`;
     const directUrl = `${HUBITAT_CLOUD_BASE_URL}${deviceId}?access_token=${HUBITAT_ACCESS_TOKEN}`;
     const primaryUrl = USE_HUBITAT_PROXY ? proxyUrl : directUrl;
-    const fallbackUrl = USE_HUBITAT_PROXY ? directUrl : null;
+    const fallbackUrl = (USE_HUBITAT_PROXY && ALLOW_DIRECT_FALLBACK) ? directUrl : null;
     const fetchJson = (u) => fetch(u, { cache: 'no-store' }).then(res => res.ok ? res.json() : Promise.reject(res));
 
     return fetchJson(primaryUrl)
