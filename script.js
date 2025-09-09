@@ -369,7 +369,21 @@ function refreshAllDeviceStates(force = false) {
     if (__isRefreshingStates) return Promise.resolve();
     __isRefreshingStates = true;
     const fetcher = force ? fetchHubitatDeviceInfo : getCachedOrFetch;
-    return Promise.all(ids.map((id) => fetcher(id)))
+
+    // Round-robin para reduzir chamadas: usa no mdximo POLL_MAX_DEVICES_PER_TICK por ciclo
+    let slice = ids;
+    try {
+        if (force && typeof POLL_MAX_DEVICES_PER_TICK !== 'undefined' && POLL_MAX_DEVICES_PER_TICK > 0) {
+            if (typeof __pollIndex !== 'number') { __pollIndex = 0; }
+            slice = [];
+            for (let i = 0; i < Math.min(POLL_MAX_DEVICES_PER_TICK, ids.length); i++) {
+                slice.push(ids[(__pollIndex + i) % ids.length]);
+            }
+            __pollIndex = (__pollIndex + slice.length) % ids.length;
+        }
+    } catch (_) {}
+
+    return Promise.all(slice.map((id) => fetcher(id)))
         .then(() => {
             syncAllElementsFromCache();
         })
@@ -380,15 +394,9 @@ function refreshAllDeviceStates(force = false) {
 
 // Tenta descobrir automaticamente URLs comuns para stream de eventos do Maker API
 function buildHubitatEventUrlCandidates() {
+    // Via proxy/cloud o Hubitat normalmente não expõe SSE; evitamos tentar.
     if (USE_HUBITAT_PROXY) {
-        const base = String(HUBITAT_PROXY_BASE_URL || '');
-        const devicesBase = /\/devices\/$/i.test(base)
-            ? base
-            : (base.endsWith('/') ? base + 'devices/' : base + '/devices/');
-        const rootBase = devicesBase.replace(/\/devices\/??$/i, '/');
-        const watchUrl = devicesBase + 'watch';
-        const eventSocketUrl = rootBase + 'eventsocket';
-        return [watchUrl, eventSocketUrl];
+        return [];
     }
     const base = HUBITAT_CLOUD_BASE_URL.replace(/\/?devices\/??$/i, '');
     const tokenQS = `access_token=${encodeURIComponent(HUBITAT_ACCESS_TOKEN)}`;
@@ -429,6 +437,11 @@ function updateCacheFromEvent(evt) {
 }
 
 function connectHubitatEvents() {
+    // Evita SSE quando usando proxy (cloud); usa apenas polling
+    if (USE_HUBITAT_PROXY) {
+        startPolling(POLL_INTERVAL_MS);
+        return;
+    }
     // If EventSource is unavailable (very old browsers), fallback to polling only
     if (typeof EventSource === 'undefined') {
         console.warn('EventSource not supported; using polling only');
@@ -502,7 +515,11 @@ function connectHubitatEvents() {
     tryNext();
 }
 
-const POLL_INTERVAL_MS = 1000; // 1s para feedback quase imediato
+// Polling params tuned to reduce request rate
+const POLL_INTERVAL_MS = 10000; // 10s when visible
+const POLL_INTERVAL_HIDDEN_MS = 60000; // 60s when hidden/background
+const POLL_MAX_DEVICES_PER_TICK = 4; // round-robin subset per tick
+let __pollIndex = 0;
 
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
@@ -524,7 +541,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
     // Polling de segurança (caso SSE não conecte)
-    startPolling(POLL_INTERVAL_MS);
+    startPolling(document.visibilityState === 'visible' ? POLL_INTERVAL_MS : POLL_INTERVAL_HIDDEN_MS);
 
     // Esconder controles que não são de luz (sem data-device-id),
     // exceto os marcados explicitamente como permitidos
