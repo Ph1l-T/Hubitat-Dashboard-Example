@@ -701,3 +701,20 @@ function acAdjustCoolingSetpoint(deviceId, delta) {
     if (disp) disp.textContent = `${next}°C`;
     sendHubitatCommand(deviceId, 'setCoolingSetpoint', String(next));
 }
+
+// --- PWA: registro do Service Worker ---
+(() => {
+  try {
+    if ('serviceWorker' in navigator) {
+      // Usa caminho relativo para funcionar em subpaths (ex.: GitHub Pages)
+      const swUrl = (document.currentScript && document.currentScript.src && document.currentScript.src.includes('/')) ? 'sw.js' : 'sw.js';
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register(swUrl).catch((err) => {
+          console.warn('Falha ao registrar Service Worker', err);
+        });
+      });
+    }
+  } catch (e) {
+    // Silencia falhas do SW para não impactar a UI
+  }
+})();

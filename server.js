@@ -49,6 +49,7 @@ function serveStatic(req, res) {
       '.gif': 'image/gif',
       '.ico': 'image/x-icon',
       '.json': 'application/json; charset=utf-8',
+      '.webmanifest': 'application/manifest+json; charset=utf-8',
     };
     const type = types[ext] || 'application/octet-stream';
     res.writeHead(200, { 'Content-Type': type, ...CORS_HEADERS });
