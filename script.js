@@ -363,7 +363,16 @@ function syncAllElementsFromCache() {
 }
 
 let __isRefreshingStates = false;
+let __awaitingAutoAssign = false;
 function refreshAllDeviceStates(force = false) {
+    try {
+        if (!__awaitingAutoAssign && typeof window !== 'undefined' && window.__autoAssignPromise) {
+            __awaitingAutoAssign = true;
+            return window.__autoAssignPromise
+                .catch(() => {})
+                .then(() => { __awaitingAutoAssign = false; return refreshAllDeviceStates(force); });
+        }
+    } catch (_) {}
     const ids = Array.from(collectAllDeviceIdsFromDOM());
     if (ids.length === 0) return Promise.resolve();
     if (__isRefreshingStates) return Promise.resolve();
@@ -884,8 +893,14 @@ function acAdjustCoolingSetpoint(deviceId, delta) {
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', run);
-  } else { run(); }
+    window.__autoAssignPromise = new Promise((resolve) => {
+      document.addEventListener('DOMContentLoaded', () => {
+        Promise.resolve(run()).finally(resolve);
+      });
+    });
+  } else {
+    window.__autoAssignPromise = Promise.resolve(run());
+  }
 })();
 
 // Ajuste de polling conforme visibilidade da página
