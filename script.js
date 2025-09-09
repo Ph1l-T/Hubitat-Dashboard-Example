@@ -103,13 +103,12 @@ function toggleDevice(el, deviceType) {
     if (!icons[deviceType]) return;
 
     let deviceId = el.dataset.deviceId || null;
-    // Fallback por label para compatibilidade
+    // Fallback por label usando catálogo dinâmico (se disponível)
     if (!deviceId) {
         const controlLabel = el.querySelector('.control-label')?.textContent?.trim();
-        if (controlLabel === 'Pendente') {
-            deviceId = '134';
-        } else if (controlLabel === 'Trilho') {
-            deviceId = '133';
+        if (typeof window !== 'undefined' && window.__deviceCatalog && controlLabel) {
+            const found = window.__deviceCatalog.find((d) => (d.label || d.name || '').toLowerCase().includes(controlLabel.toLowerCase()));
+            if (found && found.id) deviceId = String(found.id);
         }
     }
 
@@ -579,7 +578,8 @@ const KNOWN_LIGHT_IDS = [
 ];
 
 function getAllKnownLightIds() {
-    const ids = new Set(KNOWN_LIGHT_IDS);
+    const dynamic = (typeof window !== 'undefined' && Array.isArray(window.__knownLightIds)) ? window.__knownLightIds : null;
+    const ids = new Set(dynamic || KNOWN_LIGHT_IDS);
     // Adiciona quaisquer IDs presentes no DOM atual
     try {
         collectAllDeviceIdsFromDOM().forEach((id) => ids.add(String(id)));
@@ -682,7 +682,7 @@ function scenesMarkup() {
 function handleRemoteClick(btn) {
     try {
         const container = btn.closest('#tv-remote');
-        const tvId = (container && container.getAttribute('data-tv-id')) || '142';
+        const tvId = (container && container.getAttribute('data-tv-id')) || (window.__tvDeviceId || '149');
         const cmd = btn.getAttribute('data-cmd');
         const val = btn.getAttribute('data-val');
 
@@ -765,6 +765,127 @@ function acAdjustCoolingSetpoint(deviceId, delta) {
   } catch (e) {
     // Silencia falhas do SW para não impactar a UI
   }
+})();
+
+// --- Auto-assign de IDs a partir de hubitat_devices_all.json ---
+(function setupAutoAssignFromJson(){
+  async function loadCatalog(){
+    try {
+      // Tenta primeiro devices.json; se falhar, usa hubitat_devices_all.json
+      let data = null;
+      try {
+        const r1 = await fetch('devices.json', { cache: 'no-store' });
+        if (r1.ok) data = await r1.json();
+      } catch (_) {}
+      if (!data) {
+        const r2 = await fetch('hubitat_devices_all.json', { cache: 'no-store' });
+        if (!r2.ok) throw new Error('HTTP '+r2.status);
+        data = await r2.json();
+      }
+      if (!Array.isArray(data)) return null;
+      // guarda catálogo bruto
+      window.__deviceCatalog = data;
+      // filtra luzes com Switch (evita parent MolSmart Relay)
+      const lights = data.filter(d => {
+        const caps = (d.capabilities||[]).map(String);
+        const t = String(d.type||'');
+        const nm = String(d.name||'');
+        const lbl = String(d.label||'');
+        const isSwitchCap = caps.includes('Switch');
+        const isChildType = /Generic\s+Component\s+Switch/i.test(t);
+        const looksLikeSwitch = /\bSwitch-\d+\b/i.test(nm) || /\bSwitch-\d+\b/i.test(lbl);
+        const isParent = /MolSmart\s*-\s*Relay/i.test(t);
+        return !isParent && (isSwitchCap || isChildType || looksLikeSwitch);
+      });
+      // ordena por id numérico
+      lights.sort((a,b)=> Number(a.id)-Number(b.id));
+      // TV (se existir)
+      const tv = data.find(d => /TV/i.test(String(d.type||'')) || (d.capabilities||[]).includes('TV'));
+      if (tv && tv.id) window.__tvDeviceId = String(tv.id);
+      // expõe lista dinâmica p/ cenários
+      window.__knownLightIds = lights.map(d => String(d.id));
+      return { lights, tv };
+    } catch (e){
+      console.warn('Falha ao carregar hubitat_devices_all.json', e);
+      return null;
+    }
+  }
+
+  function reasssignInDOM(lights){
+    if (!Array.isArray(lights) || lights.length===0) return [];
+    const pool = lights.map(d=>String(d.id));
+    const used = new Set();
+    let idx = 0;
+    // data-device-id
+    document.querySelectorAll('[data-device-id]').forEach(el => {
+      const id = pool[idx % pool.length];
+      idx++; used.add(id);
+      el.setAttribute('data-device-id', id);
+    });
+    // data-device-ids (grupos)
+    document.querySelectorAll('[data-device-ids]').forEach(el => {
+      const original = el.getAttribute('data-device-ids')||'';
+      const count = Math.max(1, original.split(',').map(s=>s.trim()).filter(Boolean).length || 1);
+      const ids = [];
+      for (let i=0;i<count;i++){ const id = pool[idx % pool.length]; idx++; used.add(id); ids.push(id); }
+      el.setAttribute('data-device-ids', ids.join(','));
+    });
+    return pool.filter(id=>!used.has(id));
+  }
+
+  function appendExtraRooms(remaining){
+    const list = document.querySelector('.rooms-list');
+    if (!list) return;
+    // remove cards auto criados anteriormente
+    list.querySelectorAll('.room-card[data-auto-room="true"]').forEach(n => n.remove());
+    if (!remaining || remaining.length===0) return;
+    remaining.forEach((id, i) => {
+      const card = document.createElement('div');
+      card.className = 'room-card';
+      card.setAttribute('data-auto-room','true');
+      card.innerHTML = `
+        <img src="images/photos/home-photo.png" alt="Extra">
+        <span>Extra ${id}</span>
+        <div class="room-icons-row" style="z-index:11; position:relative;">
+          <div style="width:100%;height:100%;justify-content:flex-start;align-items:flex-start;gap:35px;display:inline-flex">
+            <div class="icon-toggle-light" data-state="off" data-device-ids="${id}" onclick="toggleLightIcon(this)" style="width:42px;height:42px;position:relative;cursor:pointer;">
+              <img src="images/icons/icon-small-light-off.svg" alt="Luz" style="width:100%;height:100%;object-fit:contain;position:absolute;left:0;top:0;" />
+            </div>
+          </div>
+        </div>`;
+      list.appendChild(card);
+    });
+  }
+
+  async function run(){
+    const cat = await loadCatalog();
+    if (!cat) return;
+    // Tenta reatribuir quando home estiver no DOM; se não, tenta novamente após navegação
+    const attempt = () => {
+      const remaining = reasssignInDOM(cat.lights);
+      appendExtraRooms(remaining);
+      // Sincroniza estados após aplicar
+      refreshAllDeviceStates(true).catch(()=>{});
+    };
+    // tenta já
+    attempt();
+    // e após pequenas mudanças no SPA root
+    try {
+      const root = document.getElementById('spa-root');
+      if (root) {
+        let timer = null;
+        const mo = new MutationObserver(() => {
+          if (timer) clearTimeout(timer);
+          timer = setTimeout(() => { attempt(); timer = null; }, 60);
+        });
+        mo.observe(root, { childList:true, subtree:true });
+      }
+    } catch(_){}
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', run);
+  } else { run(); }
 })();
 
 // Ajuste de polling conforme visibilidade da página
