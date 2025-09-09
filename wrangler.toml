@@ -1,0 +1,11 @@
+name = "hubitat-proxy"
+main = "cloudflare-worker/worker.js"
+compatibility_date = "2024-09-01"
+
+[vars]
+# Maker API base (sem barra no final)
+HUBITAT_BASE = "https://cloud.hubitat.com/api/e45cb756-9028-44c2-8a00-e6fb3651856c/apps/77"
+
+# Importante: adicione o segredo via painel/CLI
+#   wrangler secret put HUBITAT_TOKEN
+

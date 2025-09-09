@@ -765,3 +765,17 @@ function acAdjustCoolingSetpoint(deviceId, delta) {
     // Silencia falhas do SW para não impactar a UI
   }
 })();
+
+// Ajuste de polling conforme visibilidade da página
+try {
+  document.addEventListener('visibilitychange', () => {
+    if (typeof startPolling === 'function') {
+      if (document.visibilityState === 'visible') {
+        startPolling(typeof POLL_INTERVAL_MS !== 'undefined' ? POLL_INTERVAL_MS : 10000);
+      } else {
+        const hiddenMs = (typeof POLL_INTERVAL_HIDDEN_MS !== 'undefined') ? POLL_INTERVAL_HIDDEN_MS : 60000;
+        startPolling(hiddenMs);
+      }
+    }
+  });
+} catch (_) {}

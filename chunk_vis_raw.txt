@@ -1,0 +1,19 @@
+const POLL_MAX_DEVICES_PER_TICK = 4; // round-robin subset per tick
+let __pollIndex = 0;
+
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        // Voltar ao app: força sync e garante conexão SSE
+        refreshAllDeviceStates(true).finally(() => {
+            connectHubitatEvents();
+        });
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Sincroniza estados reais ao abrir a interface
+    refreshAllDeviceStates(true)
+        .then(() => connectHubitatEvents())
+        .catch((e) => {
+            console.error('Falha ao sincronizar estados iniciais', e);
+

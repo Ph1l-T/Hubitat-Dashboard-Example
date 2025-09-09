@@ -6,7 +6,10 @@
     "scripts":  {
                     "test":  "echo \"Error: no test specified\" \u0026\u0026 exit 1",
                     "start":  "node server.js",
-                    "icons": "node tools/generate-icons.js"
+                    "icons":  "node tools/generate-icons.js",
+                    "worker:deploy": "wrangler deploy --config wrangler.toml",
+                    "worker:dev": "wrangler dev --config wrangler.toml",
+                    "worker:tail": "wrangler tail --config wrangler.toml"
                 },
     "repository":  {
                        "type":  "git",
@@ -23,5 +26,8 @@
     "homepage":  "https://github.com/Ph1l-T/Hubitat-Dashboard-Example#readme",
     "dependencies":  {
                          "sharp":  "0.34.3"
-                     }
+                     },
+    "devDependencies":  {
+                            "wrangler":  "4.35.0"
+                        }
 }
