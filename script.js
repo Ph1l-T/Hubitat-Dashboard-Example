@@ -189,31 +189,53 @@ const HUBITAT_CLOUD_BASE_URL = 'https://cloud.hubitat.com/api/e45cb756-9028-44c2
 const HUBITAT_ACCESS_TOKEN = '759c4ea4-f9c5-4250-bd11-131221eaad76';
 
 function sendHubitatCommand(deviceId, command, value) {
-    let url;
-    if (USE_HUBITAT_PROXY) {
-        url = `${HUBITAT_PROXY_BASE_URL}${deviceId}/${command}`;
-        if (value) url += `/${value}`;
-    } else {
-        url = `${HUBITAT_CLOUD_BASE_URL}${deviceId}/${command}`;
-        if (value) url += `/${value}`;
-        url += `?access_token=${HUBITAT_ACCESS_TOKEN}`;
-    }
+    const buildProxy = () => {
+        let u = `${HUBITAT_PROXY_BASE_URL}${deviceId}/${command}`;
+        if (value) u += `/${value}`;
+        return u;
+    };
+    const buildDirect = () => {
+        let u = `${HUBITAT_CLOUD_BASE_URL}${deviceId}/${command}`;
+        if (value) u += `/${value}`;
+        u += `?access_token=${HUBITAT_ACCESS_TOKEN}`;
+        return u;
+    };
 
-    console.log(`Enviando comando para o Hubitat: ${url}`);
+    const primaryUrl = USE_HUBITAT_PROXY ? buildProxy() : buildDirect();
+    const fallbackUrl = USE_HUBITAT_PROXY ? buildDirect() : null;
 
-    fetch(url)
-        .then(response => response.ok ? response.json() : Promise.reject(response))
+    console.log(`Enviando comando para o Hubitat: ${primaryUrl}`);
+
+    const doFetch = (u) => fetch(u).then(r => r.ok ? r.json() : Promise.reject(r));
+
+    doFetch(primaryUrl)
         .then(data => console.log('Resposta do Hubitat:', data))
-        .catch(error => console.error('Erro ao enviar comando para o Hubitat:', error));
+        .catch(err => {
+            console.warn('Falha no endpoint primário', err);
+            if (fallbackUrl) {
+                console.log('Tentando fallback direto (cloud)');
+                return doFetch(fallbackUrl).then(data => console.log('Resposta (fallback):', data));
+            }
+        })
+        .catch(error => console.error('Erro ao enviar comando para o Hubitat (final):', error));
 }
 
 // Cache simples em memória para evitar requisições repetidas na carga
 const deviceStateCache = new Map(); // Map<deviceId, { raw: object, switch: 'on'|'off'|undefined, windowShade: string|undefined }>
 
 function fetchHubitatDeviceInfo(deviceId) {
-    const url = USE_HUBITAT_PROXY ? `${HUBITAT_PROXY_BASE_URL}${deviceId}` : `${HUBITAT_CLOUD_BASE_URL}${deviceId}?access_token=${HUBITAT_ACCESS_TOKEN}`;
-    return fetch(url, { cache: 'no-store' })
-        .then((res) => (res.ok ? res.json() : Promise.reject(res)))
+    const proxyUrl = `${HUBITAT_PROXY_BASE_URL}${deviceId}`;
+    const directUrl = `${HUBITAT_CLOUD_BASE_URL}${deviceId}?access_token=${HUBITAT_ACCESS_TOKEN}`;
+    const primaryUrl = USE_HUBITAT_PROXY ? proxyUrl : directUrl;
+    const fallbackUrl = USE_HUBITAT_PROXY ? directUrl : null;
+    const fetchJson = (u) => fetch(u, { cache: 'no-store' }).then(res => res.ok ? res.json() : Promise.reject(res));
+
+    return fetchJson(primaryUrl)
+        .catch((err) => {
+            console.warn('Falha ao buscar via endpoint primário', err);
+            if (fallbackUrl) return fetchJson(fallbackUrl);
+            throw err;
+        })
         .then((data) => {
             // Normaliza atributos úteis
             let switchValue;
